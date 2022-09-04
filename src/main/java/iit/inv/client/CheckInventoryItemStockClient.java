@@ -1,39 +1,20 @@
 package iit.inv.client;
 
-import iit.inv.grpc.generated.CheckInventoryStockRequest;
-import iit.inv.grpc.generated.CheckInventoryStockResponse;
+import iit.inv.grpc.generated.CheckInventoryItemStockRequest;
+import iit.inv.grpc.generated.CheckInventoryItemStockResponse;
 import iit.inv.grpc.generated.InventoryServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 import java.util.Scanner;
 
-public class CheckInventoryStockClient {
+public class CheckInventoryItemStockClient {
     private ManagedChannel channel = null;
     InventoryServiceGrpc.InventoryServiceBlockingStub clientStub = null;
     String host = null;
     int port = -1;
 
-    /**public static void main(String[] args) throws InterruptedException {
-        String host = null;
-        int port = -1;
-        if (args.length != 2) {
-            System.out.println("Usage CheckInventoryStockClient <host> <port>");
-            System.exit(1);
-        }
-        host = args[0];
-        port = Integer.parseInt(args[1].trim());
-        CheckInventoryStockClient client = new CheckInventoryStockClient(host, port);
-        client.initializeConnection();
-        try {
-            client.processUserRequests();
-        }catch (Exception e){
-            System.out.println(e.getLocalizedMessage());
-        }
-        client.closeConnection();
-    }**/
-
-    public CheckInventoryStockClient(String host, int port) throws InterruptedException {
+    public CheckInventoryItemStockClient(String host, int port) throws InterruptedException {
         this.host = host;
         this.port = port;
         this.initializeConnection();
@@ -60,13 +41,13 @@ public class CheckInventoryStockClient {
             System.out.println("\nEnter Inventory ID to check the stock :");
             int inventoryId = Integer.parseInt(userInput.nextLine().trim());
             System.out.println("Requesting server to check the inventory for " + inventoryId);
-            CheckInventoryStockRequest request = CheckInventoryStockRequest.newBuilder()
-                    .setInventoryId(inventoryId)
+            CheckInventoryItemStockRequest request = CheckInventoryItemStockRequest.newBuilder()
+                    .setItemId(inventoryId)
                     .build();
             System.out.println("request: " + request);
-            CheckInventoryStockResponse response = clientStub.checkInventoryStock(request);
+            CheckInventoryItemStockResponse response = clientStub.checkInventoryItemStock(request);
             System.out.println("response: " + response);
-            System.out.printf("Available stock is " + response.getInventory() + " pcs");
+            System.out.printf("Available stock is " + response.getItemStock() + " pcs");
             Thread.sleep(1000);
         }
     }
