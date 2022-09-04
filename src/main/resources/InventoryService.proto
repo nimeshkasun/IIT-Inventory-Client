@@ -1,0 +1,29 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package iit.inv.server.grpc.generated;
+
+message CheckInventoryStockRequest {
+  int32 inventoryId = 1;
+}
+
+message CheckInventoryStockResponse {
+  int32 inventory = 1;
+}
+
+/*
+message AddNewInventoryItemRequest {
+  int32 inventoryId = 1;
+}
+
+message AddNewInventoryItemResponse {
+  int32 inventory = 1;
+}
+*/
+
+service InventoryService {
+  //Check inventory stock available
+  rpc checkInventoryStock(CheckInventoryStockRequest) returns (CheckInventoryStockResponse);
+
+  //Add inventory stock
+  //rpc addNewInventoryItem(AddNewInventoryItemRequest) returns (AddNewInventoryItemResponse);
+}
