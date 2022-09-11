@@ -40,8 +40,12 @@ public class CheckInventoryItemStockClient {
             Scanner userInput = new Scanner(System.in);
             System.out.println("\nEnter Inventory ID to check the stock :");
             int inventoryId = Integer.parseInt(userInput.nextLine().trim());
+
+            String lockName = "chkInv";
+
             System.out.println("Requesting server to check the inventory for " + inventoryId);
             CheckInventoryItemStockRequest request = CheckInventoryItemStockRequest.newBuilder()
+                    .setLockName(lockName)
                     .setItemId(inventoryId)
                     .build();
             System.out.println("request: " + request);
