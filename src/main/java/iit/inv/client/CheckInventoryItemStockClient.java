@@ -63,7 +63,10 @@ public class CheckInventoryItemStockClient {
 
             System.out.println("Connection Initialized!");
             CheckInventoryItemStockResponse response = clientStub.checkInventoryItemStock(request);
-            System.out.printf("Available stock is " + response.getItemStock() + " pcs");
+            System.out.println("\n");
+            System.out.println("---------------------------------------------------------------------------");
+            System.out.println("Available stock is " + response.getItemStock() + " pcs");
+            System.out.println("---------------------------------------------------------------------------");
             Thread.sleep(1000);
             break;
         }
