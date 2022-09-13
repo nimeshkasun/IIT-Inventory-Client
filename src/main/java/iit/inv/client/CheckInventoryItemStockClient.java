@@ -3,9 +3,12 @@ package iit.inv.client;
 import iit.inv.grpc.generated.CheckInventoryItemStockRequest;
 import iit.inv.grpc.generated.CheckInventoryItemStockResponse;
 import iit.inv.grpc.generated.InventoryServiceGrpc;
+import iit.inv.ns.NameServiceClient;
+import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class CheckInventoryItemStockClient {
@@ -13,10 +16,10 @@ public class CheckInventoryItemStockClient {
     InventoryServiceGrpc.InventoryServiceBlockingStub clientStub = null;
     String host = null;
     int port = -1;
+    public static final String NAME_SERVICE_ADDRESS = "http://localhost:2379";
 
-    public CheckInventoryItemStockClient(String host, int port) throws InterruptedException {
-        this.host = host;
-        this.port = port;
+    public CheckInventoryItemStockClient() throws InterruptedException, IOException {
+        fetchServerDetails();
         this.initializeConnection();
         this.processUserRequests();
         this.closeConnection();
@@ -28,14 +31,14 @@ public class CheckInventoryItemStockClient {
                 .usePlaintext()
                 .build();
         clientStub = InventoryServiceGrpc.newBlockingStub(channel);
-        System.out.println("Connection Initialized!");
+        channel.getState(true);
     }
 
     private void closeConnection() {
         channel.shutdown();
     }
 
-    private void processUserRequests() throws InterruptedException {
+    private void processUserRequests() throws InterruptedException, IOException {
         while (true) {
             Scanner userInput = new Scanner(System.in);
             System.out.println("\nEnter Inventory ID to check the stock :");
@@ -48,12 +51,28 @@ public class CheckInventoryItemStockClient {
                     .setLockName(lockName)
                     .setItemId(inventoryId)
                     .build();
-            System.out.println("request: " + request);
+
+            ConnectivityState state = channel.getState(true);
+            while (state != ConnectivityState.READY) {
+                System.out.println("Service unavailable, looking for a service provider..");
+                fetchServerDetails();
+                initializeConnection();
+                Thread.sleep(5000);
+                state = channel.getState(true);
+            }
+
+            System.out.println("Connection Initialized!");
             CheckInventoryItemStockResponse response = clientStub.checkInventoryItemStock(request);
-            System.out.println("response: " + response);
             System.out.printf("Available stock is " + response.getItemStock() + " pcs");
             Thread.sleep(1000);
         }
+    }
+
+    protected void fetchServerDetails() throws IOException, InterruptedException {
+        NameServiceClient client = new NameServiceClient(NAME_SERVICE_ADDRESS);
+        NameServiceClient.ServiceDetails serviceDetails = client.findService("InventoryService");
+        host = serviceDetails.getIPAddress();
+        port = serviceDetails.getPort();
     }
 
 }

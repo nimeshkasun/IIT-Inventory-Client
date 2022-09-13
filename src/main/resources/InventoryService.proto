@@ -8,8 +8,7 @@ message CheckInventoryItemStockRequest {
 }
 
 message CheckInventoryItemStockResponse {
-  string lockName = 1;
-  int32 itemStock = 2;
+  int32 itemStock = 1;
 }
 
 service InventoryService {
