@@ -5,7 +5,6 @@ import iit.inv.ns.NameServiceClient;
 import java.io.IOException;
 
 public class InventoryClient {
-    //public static final String NAME_SERVICE_ADDRESS = "http://localhost:2379";
     public static String host = null;
     public static int port = -1;
 
@@ -23,9 +22,9 @@ public class InventoryClient {
         */
         //fetchServerDetails();
 
+        new SetInventoryItemStockClient();
         new CheckInventoryItemStockClient();
     }
-
 
 
 }

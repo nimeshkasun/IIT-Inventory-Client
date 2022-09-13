@@ -1,8 +1,6 @@
 package iit.inv.client;
 
-import iit.inv.grpc.generated.CheckInventoryItemStockRequest;
-import iit.inv.grpc.generated.CheckInventoryItemStockResponse;
-import iit.inv.grpc.generated.InventoryServiceGrpc;
+import iit.inv.grpc.generated.*;
 import iit.inv.ns.NameServiceClient;
 import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
@@ -11,14 +9,14 @@ import io.grpc.ManagedChannelBuilder;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class CheckInventoryItemStockClient {
+public class SetInventoryItemStockClient {
     private ManagedChannel channel = null;
     InventoryServiceGrpc.InventoryServiceBlockingStub clientStub = null;
     String host = null;
     int port = -1;
     public static final String NAME_SERVICE_ADDRESS = "http://localhost:2379";
 
-    public CheckInventoryItemStockClient() throws InterruptedException, IOException {
+    public SetInventoryItemStockClient() throws InterruptedException, IOException {
         fetchServerDetails();
         this.initializeConnection();
         this.processUserRequests();
@@ -41,15 +39,19 @@ public class CheckInventoryItemStockClient {
     private void processUserRequests() throws InterruptedException, IOException {
         while (true) {
             Scanner userInput = new Scanner(System.in);
-            System.out.println("\nEnter Inventory ID to check the stock :");
+            System.out.println("\nEnter Inventory ID to add :");
             int inventoryId = Integer.parseInt(userInput.nextLine().trim());
 
-            String lockName = "checkInv";
+            System.out.println("\nEnter Inventory Stock Value to save :");
+            int value = Integer.parseInt(userInput.nextLine().trim());
+
+            String lockName = "setInv";
 
             System.out.println("Requesting server to check the inventory for " + inventoryId);
-            CheckInventoryItemStockRequest request = CheckInventoryItemStockRequest.newBuilder()
+            SetInventoryItemStockRequest request = SetInventoryItemStockRequest.newBuilder()
                     .setLockName(lockName)
                     .setItemId(inventoryId)
+                    .setValue(value)
                     .build();
 
             ConnectivityState state = channel.getState(true);
@@ -62,8 +64,8 @@ public class CheckInventoryItemStockClient {
             }
 
             System.out.println("Connection Initialized!");
-            CheckInventoryItemStockResponse response = clientStub.checkInventoryItemStock(request);
-            System.out.printf("Available stock is " + response.getItemStock() + " pcs");
+            SetInventoryItemStockResponse response = clientStub.setInventoryItemStock(request);
+            System.out.printf("Inventory update status: " + response.getStatus());
             Thread.sleep(1000);
             break;
         }
@@ -75,5 +77,4 @@ public class CheckInventoryItemStockClient {
         host = serviceDetails.getIPAddress();
         port = serviceDetails.getPort();
     }
-
 }
